@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 UART Data</title>
+    <meta http-equiv="refresh" content="2"> <!-- Refresh every 2 seconds -->
+</head>
+<body>
+    <h1>ESP32 UART Data</h1>
+    <p>Received Data: <span id="data">Loading...</span></p>
+
+    <script>
+        function fetchData() {
+            fetch("/data")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("data").innerText = data;
+            });
+        }
+
+        setInterval(fetchData, 2000); // Fetch data every 2 seconds
+    </script>
+</body>
+</html>
