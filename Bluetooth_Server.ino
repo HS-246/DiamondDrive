@@ -1,33 +1,63 @@
-#include <BluetoothSerial.h>
-#include <esp_bt.h>
-#include <esp_bt_device.h>
-#include <esp_gap_bt_api.h>
-#include <esp_spp_api.h>
-  // Correctly include the library
-BluetoothSerial YantraBT;
-char cmd;
+#include <WiFi.h>
+#include <WebServer.h>
+#include <LittleFS.h>
+
+// WiFi Access Point credentials
+const char* ssid = "Arya";
+const char* password = "12345678";
+
+// UART Pins (Modify as per your connection)
+#define RXD2 16  // ESP32 RX
+#define TXD2 17  // ESP32 TX
+HardwareSerial mySerial(2);
+
+WebServer server(80);
+String latestData = "No data received";
+
+// Function to read UART data
+void readUART() {
+    if (mySerial.available()) {
+        latestData = mySerial.readStringUntil('\n');  // Read UART data
+        Serial.println("Received: " + latestData);
+    }
+}
+
+// Serve index.html from LittleFS
+void handleRoot() {
+    File file = LittleFS.open("/index.html", "r");
+    if (file) {
+        server.streamFile(file, "text/html");
+        file.close();
+    } else {
+        server.send(404, "text/plain", "File Not Found");
+    }
+}
+
+// Serve latest UART data
+void handleData() {
+    readUART();
+    server.send(200, "text/plain", latestData);
+}
 
 void setup() {
-  // Initialize BluetoothSerial with device name "Yantra"
-  YantraBT.begin("Yantra");
-  
-  // Initialize pin 2 as output
-  pinMode(2, OUTPUT);
+    Serial.begin(115200);
+    mySerial.begin(9600, SERIAL_8N1, RXD2, TXD2);  // UART2 on ESP32
+
+    WiFi.softAP(ssid, password);
+    Serial.println("WiFi AP Started. Connect to 'ESP32_AP' and open 192.168.4.1");
+
+    if (!LittleFS.begin(true)) {
+        Serial.println("LittleFS Mount Failed");
+        return;
+    }
+
+    server.on("/", handleRoot);
+    server.on("/data", handleData);
+
+    server.begin();
 }
 
 void loop() {
-  // If Bluetooth data is available, read it
-  if (YantraBT.available()) {
-    cmd = YantraBT.read();
-  }
-  
-  // Check the received command and control the output pin accordingly
-  if (cmd == '1') {  // Compare with character '1'
-    digitalWrite(2, HIGH);  // Turn on LED or whatever is connected to pin 2
-  }
-  else if (cmd == '0') {  // Compare with character '0'
-    digitalWrite(2, LOW);   // Turn off LED or device
-  }
-  
-  delay(20);  // Small delay to prevent spamming
+    server.handleClient();
+    readUART();
 }
