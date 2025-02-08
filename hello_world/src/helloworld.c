@@ -61,17 +61,17 @@ int main()
         xil_printf("\n");
     }
 
-    xil_printf("\033[1;35m---------------------------------------------------------\033[0m\n\r");
+    xil_printf("\033[1;35m------------------------------------------------------------\033[0m\n\r");
     xil_printf("\033[1;36m        Welcome to AES 128-bit Password Manager\033[0m\n\r");
-    xil_printf("\033[1;35m---------------------------------------------------------\033[0m\n\r");
+    xil_printf("\033[1;35m------------------------------------------------------------\033[0m\n\r");
 
     while (1) {
         xil_printf("\n\033[32m---------------------------------------------------------\033[0m\n\r");
-        xil_printf("\033[34mChoose an option:\033[0m\r\n");
-        xil_printf("1 - \033[1;33mEnter new user details (with encryption)\033[0m\r\n");
-        xil_printf("2 - \033[1;33mRetrieve user password (decryption)\033[0m\r\n");
-        xil_printf("3 - \033[1;33mShow all users' data\033[0m\r\n");
-        xil_printf("4 - \033[1;31mExit\033[0m\r\n");
+        xil_printf("\033[94mChoose an option:\033[0m\r\n");
+        xil_printf("1 -> \033[1;33mEnter new user details (with encryption)\033[0m\r\n");
+        xil_printf("2 -> \033[1;33mRetrieve user password (decryption)\033[0m\r\n");
+        xil_printf("3 -> \033[1;33mShow all users' data\033[0m\r\n");
+        xil_printf("4 -> \033[1;31mExit\033[0m\r\n");
 
         int choice = get_number_from_uart();
         xil_printf("\033[35mOption selected by you is: \033[1;37m%d\033[0m\r\n", choice);
@@ -180,7 +180,7 @@ void retrieve_password() {
             // xil_printf("Decrypted password: %s",decrypted_string);
             //decrypted_password=decryptAES(password_db[i].encrypted_password);
 
-            xil_printf("\033[32mPassword for user '%s' at website '%s': %s\033[0m\n\n", username, password_db[i].website,decrypted_string);
+            xil_printf("\033[32mPassword for user '%s' at website '%s': %s\033[0m\r\n\n", username, password_db[i].website,decrypted_string);
             // xil_printf("%s\n", decrypted_password);
             freeMatrix(decrypted_password);
             return;
@@ -199,7 +199,7 @@ void show_all_users() {
 
     xil_printf("\033[32mStored Users:\033[0m\r\n");
     for (int i = 0; i < user_count; i++) {
-        xil_printf("\033[1;33m%d. \033[1;37mUsername: \033[0m%s, \033[1;37mWebsite: \033[0m%s,\n \033[1;37mEncrypted Password: \033[0m\n", i + 1, password_db[i].username, password_db[i].website);
+        xil_printf("\033[1;33m%d. \033[1;37mUsername: \033[0m%s, \033[1;37mWebsite: \033[0m%s,\r\n \033[1;37mEncrypted Password: \033[0m", i + 1, password_db[i].username, password_db[i].website);
         
         for (int i = 0; i < 4; i++)
         {
@@ -208,6 +208,7 @@ void show_all_users() {
                 xil_printf("%x ",(password_db[user_count].encrypted_password)[j][i]);
             }
         }
+        xil_printf("\n\r");
     }
 }
 
