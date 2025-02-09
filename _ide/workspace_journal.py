@@ -342,3 +342,97 @@ status = platform.build()
 
 comp.build()
 
+status = platform.build()
+
+comp.build()
+
+status = comp.clean()
+
+status = platform.build()
+
+comp.build()
+
+comp = client.get_component(name="hello_world")
+status = comp.import_files(from_loc="$COMPONENT_LOCATION/../../../Downloads", files=["sha1_test.c", "sha1.h", "sha1.c"], dest_dir_in_cmp = "src")
+
+status = platform.build()
+
+comp = client.get_component(name="hello_world")
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = comp.clean()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = comp.clean()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+comp = client.get_component(name="hello_world")
+status = comp.import_files(from_loc="$COMPONENT_LOCATION/../../../Downloads", files=["sha1_test.c"], dest_dir_in_cmp = "src")
+
+status = platform.build()
+
+comp = client.get_component(name="hello_world")
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+

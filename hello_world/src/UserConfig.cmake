@@ -32,6 +32,8 @@ set(USER_COMPILE_SOURCES
 "helloworld.c"
 "key-expansion.c"
 "platform.c"
+"sha1.c"
+"sha1_test.c"
 )
 
 # -----------------------------------------

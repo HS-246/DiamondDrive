@@ -8,6 +8,7 @@
 #include "key-expansion.h"
 #include "encryption.h"
 #include "decryption.h"
+#include "sha1.h"
 
 #define UARTLITE_DEVICE_ID 0   // UART Lite device ID
 #define MAX_USERS 10
@@ -29,6 +30,8 @@ void xor_encrypt_decrypt(char *input, char *output, char *key, int key_len);
 void add_user();
 void retrieve_password();
 void show_all_users();
+void set_password();
+int check_password();
 
 
 /* User structure to store username, website, and encrypted password */
@@ -37,6 +40,9 @@ typedef struct {
     char website[WEBSITE_SIZE];
     uint8_t **encrypted_password;
 } User;
+
+char master_password[16];
+SHA1_CTX ctx;
 
 User password_db[MAX_USERS];  // Database of users
 int user_count = 0;           // Track number of stored users
@@ -65,6 +71,16 @@ int main()
     xil_printf("\033[1;36m        Welcome to AES 128-bit Password Manager\033[0m\n\r");
     xil_printf("\033[1;35m------------------------------------------------------------\033[0m\n\r");
 
+    xil_printf("Please set your Master Password (max 16 chars):\n\r");
+    set_password();
+
+    int check=0;
+    while(check==0){
+        xil_printf("\n\rPlease Login with your password: \n\r");
+        check=check_password();
+    }
+
+    
     while (1) {
         xil_printf("\n\033[32m---------------------------------------------------------\033[0m\n\r");
         xil_printf("\033[94mChoose an option:\033[0m\r\n");
@@ -72,6 +88,7 @@ int main()
         xil_printf("2 -> \033[1;33mRetrieve user password (decryption)\033[0m\r\n");
         xil_printf("3 -> \033[1;33mShow all users' data\033[0m\r\n");
         xil_printf("4 -> \033[1;31mExit\033[0m\r\n");
+        xil_printf("5 -> \033[1;33mSet New Master Password\033[0m\r\n");
 
         int choice = get_number_from_uart();
         xil_printf("\033[35mOption selected by you is: \033[1;37m%d\033[0m\r\n", choice);
@@ -90,6 +107,9 @@ int main()
                 xil_printf("\033[32mExiting... Goodbye!\033[0m\r\n");
                 cleanup_platform();
                 return 0;
+            case 5:
+                set_password();
+                break;
             default:
                 xil_printf("\033[31mInvalid choice, try again.\033[0m\r\n");
         }
@@ -211,6 +231,49 @@ void show_all_users() {
         xil_printf("\n\r");
     }
 }
+
+void set_password(){
+
+    char password[PASSWORD_SIZE];
+    get_string_from_uart(password, PASSWORD_SIZE);
+
+    char buf[SHA1_BLOCK_SIZE];
+
+
+    sha1_init(&ctx);
+	sha1_update(&ctx, password, strlen(password));
+	sha1_final(&ctx, buf);
+
+    for (int i=0; i<16; i++) {
+        master_password[i]=buf[i];
+    }
+
+    xil_printf("Set Master Password!\n\r");
+}
+
+int check_password(){
+    int pass=1;
+    char password[PASSWORD_SIZE];
+    get_string_from_uart(password, PASSWORD_SIZE);
+
+    char buf[SHA1_BLOCK_SIZE];
+    char hashed_pw[PASSWORD_SIZE];
+
+    sha1_init(&ctx);
+	sha1_update(&ctx, password, strlen(password));
+	sha1_final(&ctx, buf);
+
+    for (int i=0; i<16; i++) {
+        hashed_pw[i]=buf[i];
+    }
+
+ 	pass = pass && !memcmp(master_password, hashed_pw, PASSWORD_SIZE);
+
+ 	xil_printf("Password: %s\n", pass ? "ACCEPTED\r\n" : "WRONG PASSWORD!\r\n");
+    return pass;
+}
+
+
 
 /* Get a number input (used for menu options) */
 int get_number_from_uart() {

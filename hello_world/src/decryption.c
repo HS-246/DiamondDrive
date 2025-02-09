@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "key-expansion.h"
+#include "sha1.h"
 #define n 4
 #define CHECK_BIT(var, pos) (((var) >> (pos)) & 1)
 
